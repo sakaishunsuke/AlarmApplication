@@ -14,12 +14,13 @@ public class AlarmSetting extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alarm_setting);
 
-        Button alarm_config_button = (Button) findViewById(R.id.alarm_config_button);
+        Button alarm_make_finish_button = (Button) findViewById(R.id.alarm_make_finish_button);
         //アラーム画面へのボタン
-        alarm_config_button.setOnClickListener(new View.OnClickListener() {
+        alarm_make_finish_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                finish();
             }
         });
     }
