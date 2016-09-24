@@ -75,8 +75,7 @@ public class AlarmNotification extends Activity {
         //mp.prepare();
 
 // 再生開始
-        mp.start();
-            mp = MediaPlayer.create(this, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)  );
+        mp = MediaPlayer.create(this, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)  );
         mp.start();
     }
 

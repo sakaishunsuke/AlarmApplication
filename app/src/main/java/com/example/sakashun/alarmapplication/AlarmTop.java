@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 /**
  * Created by Saka Shun on 2016/09/04.
  */

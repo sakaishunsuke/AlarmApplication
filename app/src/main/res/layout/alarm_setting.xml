@@ -62,9 +62,8 @@
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:id="@+id/editText"
+                    android:id="@+id/alarm_content"
                     android:layout_toRightOf="@+id/textView"
-                    android:text="アラーム１"
                     android:gravity="center_vertical|right" />
 
             </RelativeLayout>
@@ -86,7 +85,7 @@
                 <SeekBar
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/seekBar"
+                    android:id="@+id/volumeSeekbar"
                     android:layout_centerVertical="true"
                     android:indeterminate="false"
                     android:max="100"
@@ -163,7 +162,7 @@
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="未設定"
+                    android:text="変更"
                     android:id="@+id/alarm_music_list_button"
                     android:layout_centerVertical="true"
                     android:layout_toEndOf="@+id/textView5" />
