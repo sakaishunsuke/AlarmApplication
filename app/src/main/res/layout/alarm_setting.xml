@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true"
+    android:id="@+id/setting_liner">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -32,16 +34,17 @@
                     android:layout_centerVertical="true"
                     android:layout_alignParentStart="true" />
 
-                <TextClock
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/alarm_time"
-                    android:foregroundGravity="center_vertical|right"
-                    android:textSize="25dp"
-                    android:layout_alignParentTop="true"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="タッチして時間を\n設定してください"
+                    android:id="@+id/alarm_time_text"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@+id/textView8"
                     android:layout_alignParentRight="true"
-                    android:gravity="center"
-                    android:layout_toRightOf="@+id/textView8" />
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center_vertical|center" />
 
             </RelativeLayout>
 
@@ -64,7 +67,8 @@
                     android:layout_height="match_parent"
                     android:id="@+id/alarm_content"
                     android:layout_toRightOf="@+id/textView"
-                    android:gravity="center_vertical|right" />
+                    android:gravity="center_vertical|right"
+                    android:inputType="text" />
 
             </RelativeLayout>
 

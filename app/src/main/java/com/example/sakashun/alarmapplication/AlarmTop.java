@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
@@ -25,6 +26,7 @@ public class AlarmTop extends Activity{
         alarm_config_button.setOnClickListener(new View.OnClickListener(){
             @Override
             public  void onClick(View v){
+                deleteFile("alarm_list_data.txt");
                 Intent intent = new Intent(getApplication()
                         ,com.example.sakashun.alarmapplication.AlarmConfig.class);
                 startActivity(intent);
