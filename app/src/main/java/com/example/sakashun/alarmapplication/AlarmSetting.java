@@ -62,6 +62,7 @@ public class AlarmSetting extends Activity{
     Button alarm_music_list_button;//アラーム曲設定ボタン
     SeekBar volumeSeekbar;//音量シークバー
     private final static int MUSIC_FILE_CODE = 12345;// 曲選択intentの識別用のコード
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,31 +82,30 @@ public class AlarmSetting extends Activity{
         final int now_volume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
 
         //アラームの番号取得
-        try{
+        try {
             InputStream in = openFileInput("alarm_list_data.txt");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String s;
             int chec_list[] = new int[20];//アラームの番号のチェックリスト
             Arrays.fill(chec_list, 0);//0で初期化
-            while((s = reader.readLine())!= null) {
+            while ((s = reader.readLine()) != null) {
                 //現在のアラームの番号を受け取る
-                System.out.println("中身は"+s+"←");
-                if(s!="\n"){
+                System.out.println("中身は" + s + "←");
+                if (s != "\n") {
                     //alarm_list_number= (int) Long.parseLong(s,0);
                     String[] strs = s.split(",");
-                    for ( int i = 0; i < strs.length; i++ ){
-                        System.out.println(String.format("分割後 %d 個目の文字列 -> %s", i+1, strs[i]));
+                    for (int i = 0; i < strs.length; i++) {
+                        System.out.println(String.format("分割後 %d 個目の文字列 -> %s", i + 1, strs[i]));
                     }
-                    chec_list[Integer.parseInt(strs[0])]=1;//チェックしていく
-                }else{
+                    chec_list[Integer.parseInt(strs[0])] = 1;//チェックしていく
+                } else {
                     System.out.println("結果NULLでした");
                 }
             }
-            int i=0;
-            while(i<20&&chec_list[i]!=0){
+            int i = 0;
+            while (i < 20 && chec_list[i] != 0) {
                 i++;//まだ使われていないのを探す。
             }
-            if(chec_list[i]==1)finish();//もし全部使われていたら終了する
             alarm_list_number = i;
             reader.close();
             alarm_content.setText("アラーム"+(alarm_list_number+1));
@@ -138,16 +138,19 @@ public class AlarmSetting extends Activity{
                     return;
                 }
 
+                //フォーカスを背景にもっていく
+                mainLayout.requestFocus();
+
                 OutputStream out;
                 try {
                     out = openFileOutput("alarm_data"+ alarm_list_number+".txt",MODE_PRIVATE);
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(out,"UTF-8"));
 
                     //追記する
-                    writer.append("name "+alarm_content.getText()+"\n");
-                    writer.append("time "+alarm_time_text.getText()+"\n");
-                    writer.append("music "+music_uri.toString()+"\n");
-                    writer.append("volume "+volumeSeekbar.getProgress()+"\n");
+                    writer.append("name,"+alarm_content.getText()+"\n");
+                    writer.append("time,"+alarm_time_text.getText()+"\n");
+                    writer.append("music,"+music_uri.toString()+"\n");
+                    writer.append("volume,"+volumeSeekbar.getProgress()+"\n");
                     writer.close();
                 } catch (IOException e) {
                     // TODO 自動生成された catch ブロック
@@ -256,8 +259,20 @@ public class AlarmSetting extends Activity{
                 }else{
                     //離れた時
                     System.out.println("離れフォーカスメソッド起動！");
-                    if(alarm_content.getText().toString().equals("")){
-                        alarm_content.setText("アラーム"+(alarm_list_number+1));
+                    if(alarm_content.getText().toString().equals("")) {
+                        alarm_content.setText("アラーム" + (alarm_list_number + 1));
+                    }else {
+                        //空白のみで埋めていないか
+                        String[] strs = alarm_content.getText().toString().split(" ");
+                        boolean flag = true;
+                        for (int i = 0; i < strs.length && flag; i++) {
+                            if(!strs[i].matches("")){
+                                flag = false;
+                            }
+                        }
+                        if(flag) {
+                            alarm_content.setText("アラーム" + (alarm_list_number + 1));
+                        }
                     }
                     // キーボードを隠す
                     inputMethodManager.hideSoftInputFromWindow(mainLayout.getWindowToken(),
@@ -338,6 +353,15 @@ public class AlarmSetting extends Activity{
             }
         });
 
+        //キャンセルボタン
+        Button cancel_button = (Button)findViewById(R.id.cancel_button);
+        cancel_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
     }
 
     // 画面タップ時の処理 フォーカスを背景に移すため
@@ -365,6 +389,7 @@ public class AlarmSetting extends Activity{
                 //サウンドピッカー以外の時は設定できない
                 Toast.makeText(this, "その曲は設定できませんでした", Toast.LENGTH_SHORT).show();
 
+                /*
                 music_uri = Uri.parse(filePath);
                 try {
                     mp=MediaPlayer.create(this,music_uri);
@@ -383,7 +408,7 @@ public class AlarmSetting extends Activity{
                     // TODO 自動生成された catch ブロック
                     e.printStackTrace();
                 }
-                /*
+
                 String decodedfilePath = null;
                 try {
                     decodedfilePath = URLDecoder.decode(filePath, "utf-8");
@@ -435,8 +460,8 @@ public class AlarmSetting extends Activity{
             //時刻が選択されたときの処理
             //alarm_time.setFormat24Hour(String.valueOf(hourOfDay)+":"+String.format("%02d", minute));
             alarm_time_text.setText(String.format("%02d", hourOfDay)+":"+String.format("%02d", minute));
+            alarm_time_text.setTextSize(30);
         }
-
     }
 
     @Override

@@ -119,9 +119,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/switch1"
-                    android:layout_alignParentTop="true"
                     android:checked="false"
-                    android:layout_alignParentEnd="true" />
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true" />
 
             </RelativeLayout>
 
@@ -176,10 +176,27 @@
         </LinearLayout>
     </ScrollView>
 
-    <Button
-        android:layout_width="137dp"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="登録"
-        android:id="@+id/alarm_make_finish_button"
-        android:layout_gravity="right" />
+        android:layout_gravity="center_horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="キャンセル"
+            android:id="@+id/cancel_button"
+            android:layout_gravity="right"
+            android:layout_weight="3" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="登録"
+            android:id="@+id/alarm_make_finish_button"
+            android:layout_gravity="right"
+            android:layout_weight="5" />
+    </LinearLayout>
+
 </LinearLayout>

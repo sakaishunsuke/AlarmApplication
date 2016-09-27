@@ -8,7 +8,14 @@
         android:layout_height="match_parent"
         android:id="@+id/alarm_list_scroll"
         android:layout_weight="8"
-        android:fillViewport="false" />
+        android:fillViewport="false" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/alarm_list_linear"></LinearLayout>
+    </ScrollView>
 
     <Button
         android:layout_width="137dp"

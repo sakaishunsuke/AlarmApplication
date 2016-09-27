@@ -65,7 +65,7 @@ public class AlarmNotification extends Activity {
     @Override
     public void onStart() {
         super.onStart();
-        if (mp == null)
+        //if (mp == null)
         // 音楽ファイルをmediaplayerに設定1
         /*mediaPlayer.setDataSource(afdescripter.getFileDescriptor(), afdescripter.getStartOffset(),
                 afdescripter.getLength());
@@ -80,13 +80,19 @@ public class AlarmNotification extends Activity {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
+        super.onStop();
         stopAndRelaese();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //stopAndRelaese();
+    }
+
     private void stopAndRelaese() {
-        if (mp != null) {
+        if (mp != null&&mp.isPlaying()==true) {
 // 再生終了
             mp.stop();
 
