@@ -5,9 +5,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -37,13 +39,9 @@ public class AlarmConfig extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alarm_config);
 
-
-
-
-
-        Button alarm_make_button = (Button) findViewById(R.id.alarm_make_button);
-        //アラーム画面へのボタン
-        alarm_make_button.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setBackgroundColor(Color.parseColor("#FF5722"));
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //アラームの番号取得
@@ -87,8 +85,10 @@ public class AlarmConfig extends Activity{
                     //20個溜まっていたら
                     Toast.makeText(AlarmConfig.this,"20個までです", Toast.LENGTH_SHORT).show();
                 }
+
             }
         });
+
 
     }
 
@@ -169,6 +169,7 @@ public class AlarmConfig extends Activity{
         //重複をなくすために、一度全部消去
         mainLayout.removeAllViews();
 
+
         for(int i=0;i<kosuu;i++) {
             final int number = aru_list[i];
 
@@ -182,6 +183,9 @@ public class AlarmConfig extends Activity{
             final TextView list_name = (TextView) incLayout.findViewById(R.id.list_name);//アラーム名
             LinearLayout alarm_list_layout = (LinearLayout) incLayout.findViewById(R.id.alarm_list_layout);//ひな形全体のレイアウト
             final Switch alarm_list_switch = (Switch)incLayout.findViewById(R.id.alarm_list_switch);//アラームonoffスイッチ
+
+
+
             String vibrator = null;
             String led = null;
             String sunuzu = null;
@@ -230,10 +234,10 @@ public class AlarmConfig extends Activity{
                     // 確認ダイアログの生成
                     AlertDialog.Builder alertDlg = new AlertDialog.Builder(AlarmConfig.this);
                     alertDlg.setTitle(list_name.getText());
-                    alertDlg.setMessage("アラーム時間　　　" + list_time.getText()+ "\n" +
-                            "バイブレーション　" + finalVibrator + "\n" +
-                            "LEDの点減　 　　　" + finalLed + "\n" +
-                            "スヌーズ　　　　　" + finalSunuzu + "\n");
+                    alertDlg.setMessage("アラーム時間　　　　" + "\t" + list_time.getText()+ "\n" +
+                            "バイブレーション　　" + "\t"  + finalVibrator + "\n" +
+                            "LEDの点減　　　　　 " + "\t"  + finalLed + "\n" +
+                            "スヌーズ　　　　　　" + "\t"  + finalSunuzu + "\n");
                     alertDlg.setPositiveButton(
                             "消去",
                             new DialogInterface.OnClickListener() {

@@ -7,7 +7,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_text_size_display_3_material"
+        android:layout_height="64dp"
         android:background="@color/colorTitle">
 
         <ImageView
@@ -48,7 +48,7 @@
         android:background="@color/colorBlack"/>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_text_size_display_3_material"
+        android:layout_height="64dp"
         android:background="@color/colorTitle">
 
         <TextView
@@ -101,7 +101,7 @@
                 android:background="@color/colorBlack"/>
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/abc_text_size_display_3_material"
+                android:layout_height="64dp"
                 android:id="@+id/alarm_time_layout">
 
                 <TextView
@@ -144,7 +144,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/abc_text_size_display_3_material" >
+                android:layout_height="64dp" >
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -194,7 +194,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/abc_text_size_display_3_material"
+                android:layout_height="64dp"
                 android:id="@+id/vibrator_layout">
 
                 <ImageView
@@ -234,7 +234,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/abc_text_size_display_3_material"
+                android:layout_height="64dp"
                 android:layout_gravity="center_horizontal"
                 android:id="@+id/light_layout">
 
@@ -274,7 +274,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/abc_text_size_display_3_material"
+                android:layout_height="64dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignRight="@+id/sunuzu_switch"
                 android:id="@+id/music_layout">
@@ -337,7 +337,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/abc_text_size_display_3_material"
+                android:layout_height="64dp"
                 android:id="@+id/sunuzu_layout">
 
                 <ImageView

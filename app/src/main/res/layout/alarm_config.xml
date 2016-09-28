@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_text_size_display_3_material"
-        android:background="@color/colorTitle" >
+        android:layout_height="64dp"
+        android:background="@color/colorTitle">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:id="@+id/imageView8"
+            android:id="@+id/imageView"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:src="@drawable/ic_home_3x"
@@ -21,35 +22,49 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="アラーム一覧"
-            android:id="@+id/textView11"
+            android:text="アラーム"
+            android:id="@+id/screen_name_text"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/imageView8"
+            android:layout_toRightOf="@+id/imageView"
             android:textSize="25dp"
             android:textColor="#ffffff" />
 
     </RelativeLayout>
 
-    <ScrollView
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/alarm_list_scroll"
-        android:layout_weight="8"
-        android:fillViewport="false" >
+        android:layout_height="1px"
+        android:background="@color/colorBlack"/>
 
-        <LinearLayout
-            android:orientation="vertical"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/alarm_list_linear"></LinearLayout>
-    </ScrollView>
+            android:id="@+id/alarm_list_scroll"
+            android:fillViewport="false" >
 
-    <Button
-        android:layout_width="137dp"
-        android:layout_height="wrap_content"
-        android:text="新規アラーム作成"
-        android:id="@+id/alarm_make_button"
-        android:layout_gravity="right" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/alarm_list_linear"></LinearLayout>
+        </ScrollView>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|end"
+            app:background="@color/colorTitle"
+            android:src="@drawable/ic_add_white2_3x"
+            android:visibility="visible"
+            android:layout_marginRight="50dp"
+            android:layout_marginBottom="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true" />
+    </RelativeLayout>
 
 </LinearLayout>
