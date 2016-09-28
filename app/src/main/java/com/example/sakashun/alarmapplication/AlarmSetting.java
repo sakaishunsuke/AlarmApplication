@@ -3,11 +3,14 @@ package com.example.sakashun.alarmapplication;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
@@ -23,8 +26,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Switch;
 import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -52,35 +58,73 @@ import java.io.IOException;
  */
 public class AlarmSetting extends Activity{
 
+    TextView screen_name_text;//この画面の名前
     int alarm_list_number=0;//アラームの番号
+    TextView alarm_make_finish;//登録ボタン
+    EditText alarm_name;//アラームの名前(タイトル)
     TextView alarm_time_text;//アラームの時間
-    MediaPlayer mp = new MediaPlayer();//アラーム音の格納
-    EditText alarm_content;//アラームの内容(タイトル)
+    RelativeLayout alarm_time_layout;//アラームの時間のレイアウト
+    SeekBar volumeSeekbar;//音量シークバー
+    Switch vibrator_switch;//バイブレーション
+    RelativeLayout vibrator_layout;//バイブレーションのレイアウト
+    Switch light_switch;//LEDの点減
+    RelativeLayout light_layout;//LED点減のレイアウト
+    MediaPlayer mp = new MediaPlayer();//アラーム曲の格納
+    Uri music_uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);//アラーム曲のUriフィールド
+    private final static int MUSIC_FILE_CODE = 12345;// 曲選択intentの識別用のコード
+    TextView music_name_text;//アラーム曲の名前
+    RelativeLayout music_layout;//アラーム曲のレイアウト
+    TextView sunuzu_text;//スヌーズの時間または文字のテキスト
+    RelativeLayout sunuzu_layout;//スヌーズのレイアウト
+
     InputMethodManager inputMethodManager;// キーボード表示を制御するためのオブジェク
     private LinearLayout mainLayout;// 背景のレイアウト
-    Uri music_uri=RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);//アラーム曲のUri
-    Button alarm_music_list_button;//アラーム曲設定ボタン
-    SeekBar volumeSeekbar;//音量シークバー
-    private final static int MUSIC_FILE_CODE = 12345;// 曲選択intentの識別用のコード
+    AudioManager am;// AudioManagerのフィールド
+    int now_volume;//今現在の音量を格納する
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.alarm_setting);
-
-        alarm_content = (EditText)findViewById(R.id.alarm_content);//アラームの内容(タイトル)
+    public void linkSet(){
+        alarm_make_finish =
+                (TextView) findViewById(R.id.alarm_make_finish);//登録ボタン
+        alarm_name = (EditText)findViewById(R.id.alarm_name);//アラームの名前(タイトル)
+        alarm_time_text = (TextView)findViewById(R.id.alarm_time_text);//アラームの時間
+        alarm_time_layout=(RelativeLayout)findViewById(R.id.alarm_time_layout);//アラームの時間のレイアウト
         volumeSeekbar = (SeekBar)findViewById(R.id.volumeSeekbar);//音量シークバー
+        vibrator_switch = (Switch)findViewById(R.id.vibrator_switch);//バイブレーション
+        vibrator_layout = (RelativeLayout)findViewById(R.id.vibrator_layout);//バイブレーションのレイアウト
+        light_switch = (Switch)findViewById(R.id.light_switch);//LEDの点減
+        light_layout = (RelativeLayout)findViewById(R.id.light_layout);//LED点減のレイアウト
+        music_name_text = (TextView)findViewById(R.id.music_name_text);//アラーム曲の名前
+        music_layout = (RelativeLayout)findViewById(R.id.music_layout);//アラーム曲のレイアウト
+        sunuzu_text = (TextView)findViewById(R.id.sunuzu_text); //スヌーズの時間または文字のテキスト
+        sunuzu_layout = (RelativeLayout)findViewById(R.id.sunuzu_layout); //スヌーズのレイアウト
+
         inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);//キーボードのオブジェクト設定
         mainLayout = (LinearLayout) findViewById(R.id.setting_liner);//このアクティビティのレイアウト取得
 
-        //アラームのデフォルトの曲をセット&リピート設定
-        mp=MediaPlayer.create(this,music_uri);
-        mp.setLooping(true);
-        // AudioManagerを取得する
-        final AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        //曲再生時の音量を取得
-        final int now_volume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
-
+        mp=MediaPlayer.create(this,music_uri);//アラームのデフォルトの曲をセット
+        mp.setLooping(true);//リピート設定
+        System.out.println("uriだよ　"+music_uri.toString());
+        //↓曲名取得
+        RingtoneManager manager = new RingtoneManager(AlarmSetting.this);// マネージャを作成
+        manager.setType(RingtoneManager.TYPE_ALARM);//アラーム音のセット
+        //カーソルを取得して、moveToNextしていく
+        Cursor cursor = manager.getCursor();
+        music_name_text.setText(cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX));
+        System.out.println("曲名:"+music_name_text.getText());
+        while (cursor.moveToNext()) {
+            String title = cursor.getString(RingtoneManager.TITLE_COLUMN_INDEX);    // 着信音などの名前
+            System.out.println("曲名:" + title);
+            /*
+            String uriPrefix = cursor.getString(RingtoneManager.URI_COLUMN_INDEX);
+            String index = cursor.getString(RingtoneManager.ID_COLUMN_INDEX);
+            String uri = uriPrefix + "/" + index;                                   // ※URIはuriPrefixとindexをつなげる必要あり
+           */
+        }
+        //Toast.makeText(this, "初期設定の曲の名前が取得できませんでした", Toast.LENGTH_SHORT).show();
+        am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);// AudioManagerを取得する
+        now_volume = am.getStreamVolume(AudioManager.STREAM_MUSIC);//曲再生時の音量を取得
+    }
+    public void numberGet(){
         //アラームの番号取得
         try {
             InputStream in = openFileInput("alarm_list_data.txt");
@@ -108,7 +152,7 @@ public class AlarmSetting extends Activity{
             }
             alarm_list_number = i;
             reader.close();
-            alarm_content.setText("アラーム"+(alarm_list_number+1));
+            alarm_name.setText("アラーム"+(alarm_list_number+1));
         }catch(IOException e){
             //もし番号の取得に失敗つまりは、最初だった場合はファイルだけ新しく作る
             alarm_list_number = 0;
@@ -125,19 +169,17 @@ public class AlarmSetting extends Activity{
                 ee.printStackTrace();
                 Toast.makeText(AlarmSetting.this,"アラーム番号の初回設定に失敗", Toast.LENGTH_SHORT).show();
             }
-            alarm_content.setText("アラーム"+(alarm_list_number+1));
+            alarm_name.setText("アラーム"+(alarm_list_number+1));
         }
-
-        //登録ボタン
-        final Button alarm_make_finish_button = (Button) findViewById(R.id.alarm_make_finish_button);
-        alarm_make_finish_button.setOnClickListener(new View.OnClickListener() {
+    }
+    public void alarm_make_finish_buttonSet(){
+        alarm_make_finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(alarm_time_text.getText().toString().matches(".*:.*")==false){
                     Toast.makeText(AlarmSetting.this,"時間を設定してください", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 //フォーカスを背景にもっていく
                 mainLayout.requestFocus();
 
@@ -147,10 +189,14 @@ public class AlarmSetting extends Activity{
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(out,"UTF-8"));
 
                     //追記する
-                    writer.append("name,"+alarm_content.getText()+"\n");
+                    writer.append("name,"+alarm_name.getText()+"\n");
                     writer.append("time,"+alarm_time_text.getText()+"\n");
-                    writer.append("music,"+music_uri.toString()+"\n");
                     writer.append("volume,"+volumeSeekbar.getProgress()+"\n");
+                    writer.append("vibrator,"+vibrator_switch.isChecked()+"\n");
+                    writer.append("light,"+light_switch.isChecked()+"\n");
+                    writer.append("music,"+music_uri.toString()+"\n");
+                    writer.append("music_name,"+music_name_text.getText()+"\n");
+                    writer.append("sunuzu,"+sunuzu_text.getText()+"\n");
                     writer.close();
                 } catch (IOException e) {
                     // TODO 自動生成された catch ブロック
@@ -214,8 +260,8 @@ public class AlarmSetting extends Activity{
 
                 System.out.println("内容確認↓");
                 try{
-                    //InputStream in = openFileInput("alarm_data"+alarm_list_number+".txt");
-                    InputStream in = openFileInput("alarm_list_data.txt");
+                    InputStream in = openFileInput("alarm_data"+alarm_list_number+".txt");
+                    //InputStream in = openFileInput("alarm_list_data.txt");
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
                     String s;
                     while((s = reader.readLine())!= null) {
@@ -231,39 +277,25 @@ public class AlarmSetting extends Activity{
                 finish();
             }
         });
-
-        //アラーム時間のボタン
-        alarm_time_text = (TextView)findViewById(R.id.alarm_time_text);
-
-        System.out.println(alarm_time_text.getText());
-
-        alarm_time_text.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                TimePickerDialogFragment timePicker = new TimePickerDialogFragment();
-                //timePicker.getShowsDialog();
-                timePicker.show(getFragmentManager(), "timePicker");
-            }
-        });
-
-
+    }
+    public void nameSet(){
         //アラームの名前のフォーカス設定
-        alarm_content.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        alarm_name.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus){
                     //受け取った時
-                    if(alarm_content.getText().toString().equals( ("アラーム"+ (alarm_list_number+1) ) ) ) {
-                        alarm_content.setText("");
+                    if(alarm_name.getText().toString().equals( ("アラーム"+ (alarm_list_number+1) ) ) ) {
+                        alarm_name.setText("");
                     }
                 }else{
                     //離れた時
                     System.out.println("離れフォーカスメソッド起動！");
-                    if(alarm_content.getText().toString().equals("")) {
-                        alarm_content.setText("アラーム" + (alarm_list_number + 1));
+                    if(alarm_name.getText().toString().equals("")) {
+                        alarm_name.setText("アラーム" + (alarm_list_number + 1));
                     }else {
                         //空白のみで埋めていないか
-                        String[] strs = alarm_content.getText().toString().split(" ");
+                        String[] strs = alarm_name.getText().toString().split(" ");
                         boolean flag = true;
                         for (int i = 0; i < strs.length && flag; i++) {
                             if(!strs[i].matches("")){
@@ -271,7 +303,7 @@ public class AlarmSetting extends Activity{
                             }
                         }
                         if(flag) {
-                            alarm_content.setText("アラーム" + (alarm_list_number + 1));
+                            alarm_name.setText("アラーム" + (alarm_list_number + 1));
                         }
                     }
                     // キーボードを隠す
@@ -280,8 +312,8 @@ public class AlarmSetting extends Activity{
                 }
             }
         });
-        //EditTextにリスナーをセット
-        alarm_content.setOnKeyListener(new View.OnKeyListener() {
+        //EditTextにリスナーをセット（要はキーボードで決定した時に↑のフォーカス離れの機能が動くようにする文）
+        alarm_name.setOnKeyListener(new View.OnKeyListener() {
             //コールバックとしてonKey()メソッドを定義
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -294,25 +326,21 @@ public class AlarmSetting extends Activity{
                 return false;
             }
         });
-
-        //アラーム曲設定ボタン
-        alarm_music_list_button = (Button) findViewById(R.id.alarm_music_list_button);
-        alarm_music_list_button.setOnClickListener(new View.OnClickListener() {
+    }
+    public void timeSet(){
+        //アラーム時間のボタン
+        alarm_time_layout.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-
-                //Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                //intent.setType("audio/*");
-                //startActivityForResult(intent, MUSIC_FILE_CODE);
-
-                //Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                //intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT,false);
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
-                startActivityForResult(intent,MUSIC_FILE_CODE);
+            public void onClick(View v){
+                TimePickerDialogFragment timePicker = new TimePickerDialogFragment();
+                //timePicker.getShowsDialog();
+                //アラームの時間を決める時に時間のダイアログを出す
+                timePicker.show(getFragmentManager(), "timePicker");
             }
         });
 
+    }
+    public void seekbarSet(){
         //音量シークバー設定
         volumeSeekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
@@ -333,9 +361,10 @@ public class AlarmSetting extends Activity{
             public void onStartTrackingTouch(SeekBar volumeSeekbar) {
                 // トグル（シークバーのつまみ）がタッチされたときの動作
                 am.setStreamVolume(AudioManager.STREAM_MUSIC,100,0);//音量をmaxにする
+                mp.setLooping(true);//リピート設定
                 if(mp!=null)
-                    mp.seekTo(0); // プレイ中のBGMをスタート位置に戻す
-                    mp.start();
+                   // mp.seekTo(0); // プレイ中のBGMをスタート位置に戻す
+                mp.start();
             }
             public void onStopTrackingTouch(SeekBar volumeSeekbar) {
                 // トグル（シークバーのつまみ）がリリースされたときの動作
@@ -352,19 +381,92 @@ public class AlarmSetting extends Activity{
                 }
             }
         });
-
-        //キャンセルボタン
-        Button cancel_button = (Button)findViewById(R.id.cancel_button);
-        cancel_button.setOnClickListener(new View.OnClickListener() {
+    }
+    public void vibrator_ledSet() {
+        //追われたら反転するようにする
+        vibrator_layout.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v) {
-                finish();
+            public void onClick(View v){
+                vibrator_switch.setChecked(!vibrator_switch.isChecked());
             }
         });
+        light_layout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                light_switch.setChecked(!light_switch.isChecked());
+            }
+        });
+    }
+    public void musicSet(){
+        //アラーム曲設定ボタン
+        music_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //サウンドピッカー系を起動して受け取る
+                //Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                //intent.setType("audio/*");
+                //startActivityForResult(intent, MUSIC_FILE_CODE);
+
+                //Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                //intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT,false);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
+                startActivityForResult(intent,MUSIC_FILE_CODE);
+            }
+        });
+    }
+    public void sunuxuSet(){
+        //スヌーズ設定
+        sunuzu_layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String item_list[] = new String[] {
+                        "なし",
+                        "5分",
+                        "10分",
+                        "15分",
+                        "20分",
+                        "25分",
+                        "30分" };
+
+                int chec_number = -1;
+                for (int i=0; i<7 && chec_number==-1; i++) {
+                    if(sunuzu_text.getText().toString().matches(item_list[i]))
+                        chec_number = i;
+                }
+                new AlertDialog.Builder(AlarmSetting.this)
+                        //.setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("スヌーズ間隔")
+                        .setSingleChoiceItems(item_list, chec_number, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                //⇒アイテムを選択した時のイベント処理
+                                sunuzu_text.setText(item_list[whichButton]);
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
+        });
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.alarm_setting);
+
+        linkSet();//各フィールドとレイアウトをつなげる
+        numberGet();//この新規アラームの番号を取得する
+        alarm_make_finish_buttonSet();//追加(保存)ボタンの内容
+        nameSet();//アラームの名前系の内容
+        timeSet();//アラームの時刻系の内容
+        seekbarSet();//シークバーの内容
+        vibrator_ledSet();//バイブとLEDの内容
+        musicSet();//アラーム曲の内容
+        sunuxuSet();//スヌーズの設定
 
     }
 
-    // 画面タップ時の処理 フォーカスを背景に移すため
+    // 画面タップ時の処理 フォーカスを背景に移すため(あんま意味ない)
     @Override
     public boolean onTouchEvent(MotionEvent event) {
     // キーボードを隠す
@@ -431,11 +533,29 @@ public class AlarmSetting extends Activity{
                 //mp.setDataSource(data.getData());
                mp.start();
                */
-            }else{
-                music_uri = (Uri) data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-                //alarm_music_list_button.setText( music_uri.toString() );
-                mp = MediaPlayer.create(this, music_uri);
-                //mp.start();
+            }else {
+                Uri uri = (Uri) data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                if(uri!=null) {
+                    Cursor personCursor = managedQuery(uri, null, null, null, null);
+                    if (personCursor.moveToFirst()) {
+                        int albumimageIndex =
+                                personCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME);
+                        String albumart = personCursor.getString(albumimageIndex);
+                        String[] strs = albumart.split("\\.");//「 .」は特殊文字だから注意
+                        music_name_text.setText(strs[0]);
+                    }else{
+                        Toast.makeText(this, "洗濯した曲の名前が取得できませんでした", Toast.LENGTH_SHORT).show();
+                    }
+
+                    music_uri = (Uri) data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                    //alarm_music_list_button.setText( music_uri.toString() );
+                    System.out.println("ファイルパスだよ！２　" + (filePath = music_uri.toString()));
+                    music_uri = Uri.parse(filePath);
+                    mp = MediaPlayer.create(this, music_uri);
+                    //mp.start();
+                }else{
+                    Toast.makeText(this, "その曲は設定できませんでした", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
@@ -467,10 +587,6 @@ public class AlarmSetting extends Activity{
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stopAndRelaese();
-    }
-
-    private void stopAndRelaese() {
         //もし曲がセットされていたら
         if (mp != null) {
             // 再生終了

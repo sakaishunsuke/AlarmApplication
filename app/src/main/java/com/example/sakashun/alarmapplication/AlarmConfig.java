@@ -5,12 +5,16 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +36,9 @@ public class AlarmConfig extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.alarm_config);
+
+
+
 
 
         Button alarm_make_button = (Button) findViewById(R.id.alarm_make_button);
@@ -82,6 +89,7 @@ public class AlarmConfig extends Activity{
                 }
             }
         });
+
     }
 
     @Override
@@ -170,26 +178,34 @@ public class AlarmConfig extends Activity{
             incLayout = (LinearLayout) inflater.inflate(R.layout.alarm_config_list, null);
 
             //各部分のアクセスの処理を書く
-            TextView list_time = (TextView) incLayout.findViewById(R.id.list_time);
-            list_time.setText(time_list[number]);
+            final TextView list_time = (TextView) incLayout.findViewById(R.id.list_time);//アラーム時間
+            final TextView list_name = (TextView) incLayout.findViewById(R.id.list_name);//アラーム名
+            LinearLayout alarm_list_layout = (LinearLayout) incLayout.findViewById(R.id.alarm_list_layout);//ひな形全体のレイアウト
+            final Switch alarm_list_switch = (Switch)incLayout.findViewById(R.id.alarm_list_switch);//アラームonoffスイッチ
+            String vibrator = null;
+            String led = null;
+            String sunuzu = null;
 
-            final TextView list_name = (TextView) incLayout.findViewById(R.id.list_name);
+            list_time.setText(time_list[number]);//時間のセット
             try {
                 InputStream in = openFileInput("alarm_data" + number + ".txt");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
                 String s;
-                while ((s = reader.readLine()) != null) {
-                    //現在のアラームの番号を受け取る
-                    if (s != "\n") {
+                    while ((s = reader.readLine()) != null) {
+                        //現在のアラームの番号を受け取る
+                        System.out.println("中身は" + s + "←");
                         //alarm_list_number= (int) Long.parseLong(s,0);
                         String[] strs = s.split(",");
                         if (strs[0].matches("name")) {
-                            list_name.setText(strs[1]);//名前をセットする
+                            list_name.setText(strs[1]);
+                        } else if (strs[0].matches("vibrator")) {
+                            vibrator = (strs[1].matches("true")) ? "ON" : "OFF";
+                        } else if (strs[0].matches("light")) {
+                            led = (strs[1].matches("true")) ? "ON" : "OFF";
+                        } else if (strs[0].matches("sunuzu")) {
+                            sunuzu = (strs[1]);
                         }
-                    } else {
-                        System.out.println("改行が入りました");
                     }
-                }
                 reader.close();
             } catch (IOException e) {
                 //もし番号の取得に失敗つまりは、最初だった場合はファイルだけ新しく作る
@@ -197,11 +213,96 @@ public class AlarmConfig extends Activity{
                 System.out.println("アラームデータ" + number + "がありません");
             }
 
+            //タッチされてアラームがonoffになるようにする
+            alarm_list_layout.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v){
+                    alarm_list_switch.setChecked(!alarm_list_switch.isChecked());
+                }
+            });
+
+            final String finalVibrator = vibrator;
+            final String finalLed = led;
+            final String finalSunuzu = sunuzu;
+            alarm_list_layout.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    // 確認ダイアログの生成
+                    AlertDialog.Builder alertDlg = new AlertDialog.Builder(AlarmConfig.this);
+                    alertDlg.setTitle(list_name.getText());
+                    alertDlg.setMessage("アラーム時間　　　" + list_time.getText()+ "\n" +
+                            "バイブレーション　" + finalVibrator + "\n" +
+                            "LEDの点減　 　　　" + finalLed + "\n" +
+                            "スヌーズ　　　　　" + finalSunuzu + "\n");
+                    alertDlg.setPositiveButton(
+                            "消去",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // OK ボタンクリック処理
+                                    //まずはもともと書いてある内容から消したい番号以外を読み取る
+                                    String[] copy = new String[20];
+                                    int list_count = 0;
+                                    try{
+                                        InputStream in = openFileInput("alarm_list_data.txt");
+                                        BufferedReader reader = new BufferedReader(new InputStreamReader(in,"UTF-8"));
+                                        String s;
+                                        while((s = reader.readLine())!= null) {
+                                            //現在のアラームの番号を受け取る
+                                            //alarm_list_number= (int) Long.parseLong(s,0);
+                                            String[] strs = s.split(",");
+                                            if (Integer.parseInt(strs[0])!=number) {
+                                                copy[list_count++]  = s;//消去する番号以外の内容を保存
+                                            }
+                                        }
+                                        reader.close();
+                                    }catch(IOException e){
+                                        //ファイルオープンに失敗
+                                        e.printStackTrace();
+                                        System.out.println("error code 1");
+                                    }
+                                    //次に、保存した内容を上書きする
+                                    try {
+                                        OutputStream out = openFileOutput("alarm_list_data.txt",MODE_PRIVATE);
+                                        PrintWriter writer = new PrintWriter(new OutputStreamWriter(out,"UTF-8"));
+                                        //追記する
+                                        for(int i=0;i<list_count;i++) {
+                                            writer.append(copy[i] + "\n");//保存した内容を書き込む
+                                        }
+                                        writer.close();
+                                    } catch (IOException ee) {
+                                        // TODO 自動生成された catch ブロック
+                                        ee.printStackTrace();
+                                        System.out.println("error code 2");
+                                    }
+                                    alarm_list_make();//再起させてリストを作り直す
+                                }
+                            });
+                    alertDlg.setNegativeButton(
+                            "編集",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // 編集 ボタンクリック処理
+                                    Intent intent = new Intent(getApplication()
+                                            ,com.example.sakashun.alarmapplication.AlarmEdit.class);
+                                    intent.putExtra("number",number);
+                                    startActivity(intent);
+                                }
+                            });
+                    // 表示
+                    alertDlg.create().show();
+                    return true;//ここをfalesにするとタップの処理も実行される
+                }
+            });
+            /*
             ImageButton config_button = (ImageButton) incLayout.findViewById(R.id.list_config_button);
             config_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(AlarmConfig.this, "まだ作ってないｗ", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(getApplication()
+                            ,com.example.sakashun.alarmapplication.AlarmEdit.class);
+                    intent.putExtra("number",number);
+                    startActivity(intent);
+
                 }
             });
             config_button.setOnLongClickListener(new View.OnLongClickListener(){
@@ -267,6 +368,7 @@ public class AlarmConfig extends Activity{
                     return true;
                 }
             });
+            */
             mainLayout.addView(incLayout);//追加したlogを反映させる
         }
     }
