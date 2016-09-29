@@ -11,6 +11,8 @@ import android.widget.Button;
  */
 public class AlarmConfig extends Activity{
 
+    private static final  R = ;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
