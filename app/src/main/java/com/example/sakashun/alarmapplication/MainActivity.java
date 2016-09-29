@@ -28,8 +28,9 @@ public class MainActivity extends Activity {
         alarm_button.setOnClickListener(new View.OnClickListener(){
             @Override
             public  void onClick(View v){
+                //deleteFile("alarm_list_data.txt");
                 Intent intent = new Intent(getApplication()
-                        ,com.example.sakashun.alarmapplication.AlarmTop.class);
+                        ,com.example.sakashun.alarmapplication.AlarmConfig.class);
                 startActivity(intent);
 
             }

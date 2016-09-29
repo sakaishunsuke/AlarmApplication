@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:nestedScrollingEnabled="false"
+    android:longClickable="false"
+    android:id="@+id/alarm_list_layout"
+    android:weightSum="1">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="#fbe9e7">
+
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/alarm_list_switch"
+            android:checked="false"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="37dp"
+            android:layout_toLeftOf="@+id/alarm_list_switch"
+            android:id="@+id/linearLayout">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#ffab91"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="アラーム１"
+                    android:id="@+id/list_name"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:textSize="20dp"
+                    android:layout_alignParentTop="true"
+                    android:textColor="#000000" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                style="@style/diagonalStyle"
+                android:layout_weight="1"></RelativeLayout>
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@+id/alarm_list_switch"
+            android:layout_below="@+id/linearLayout"
+            android:layout_alignParentBottom="true">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="10:55"
+                android:id="@+id/list_time"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"
+                android:foregroundGravity="center|center_horizontal"
+                android:gravity="center_vertical|center"
+                android:textColor="#000000"
+                android:textIsSelectable="false"
+                android:singleLine="true"
+                android:layout_weight="1"
+                android:textSize="20dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/textView10"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:background="#ffab91"
+            android:layout_height="10dp"
+            android:alpha="100" />
+
+    </RelativeLayout>
+
+</LinearLayout>
