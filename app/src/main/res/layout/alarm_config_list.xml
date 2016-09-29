@@ -20,19 +20,20 @@
             android:id="@+id/alarm_list_switch"
             android:checked="false"
             android:layout_centerVertical="true"
-            android:layout_alignParentRight="true" />
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="60dp" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="37dp"
-            android:layout_toLeftOf="@+id/alarm_list_switch"
-            android:id="@+id/linearLayout">
+            android:id="@+id/linearLayout"
+            android:layout_alignParentRight="true">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#ffab91"
+                android:background="@color/colorAlarmList"
                 android:layout_weight="1">
 
                 <TextView
@@ -63,9 +64,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_alignParentLeft="true"
-            android:layout_toLeftOf="@+id/alarm_list_switch"
             android:layout_below="@+id/linearLayout"
-            android:layout_alignParentBottom="true">
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true">
 
             <TextView
                 android:layout_width="match_parent"
@@ -92,7 +93,7 @@
 
         <View
             android:layout_width="match_parent"
-            android:background="#ffab91"
+            android:background="@color/colorAlarmList"
             android:layout_height="10dp"
             android:alpha="100" />
 
