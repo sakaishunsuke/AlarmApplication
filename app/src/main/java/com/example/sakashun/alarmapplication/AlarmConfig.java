@@ -34,8 +34,6 @@ import java.util.Arrays;
  */
 public class AlarmConfig extends Activity{
 
-    private static final  R = ;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
